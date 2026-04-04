@@ -75,7 +75,7 @@ class GitHubContributionAnalyzer:
 
     def wait_for_rate_limit(self):
         """Wait if we're close to hitting the rate limit"""
-        if self.rate_limit_remaining > 10:
+        if self.rate_limit_remaining < 10:
             current_time = time.time()
             if current_time < self.rate_limit_reset:
                 wait_time = self.rate_limit_reset - current_time + 5  # Add 5 seconds buffer
@@ -169,7 +169,7 @@ class GitHubContributionAnalyzer:
                             stats['pr_open'] += 1
                         elif pr.get('state') == 'closed':
                             # Check if PR was merged using pull_request.merged_at field
-                            if not pr.get('pull_request', {}).get('merged_at'):
+                            if pr.get('pull_request', {}).get('merged_at'):
                                 org_stats['pr_merged'] += 1
                                 stats['pr_merged'] += 1
                             
@@ -383,7 +383,7 @@ class GitHubContributionAnalyzer:
             )
         
         # Sort by score
-        df = df.sort_values('contribution_score', ascending=True)
+        df = df.sort_values('contribution_score', ascending=False)
         
         # Metadata for the report
         metadata = {
@@ -624,13 +624,13 @@ def main():
             sys.exit(1)
     
     # Get organizations from .env
-    org_str = os.getenv("GITHUB_ORGANIZATIONS", "AOSSIE-Org,StabilityNexus")
+    org_str = os.getenv("GITHUB_ORGS", "AOSSIE-Org,StabilityNexus")
     organizations = [org.strip() for org in org_str.split(",")]
     print(f"Analyzing contributions across the following organizations: {', '.join(organizations)}")
     
     # Get usernames from .env or file
     usernames = []
-    env_usernames = os.getenv("GITHUB_USERNAMES")
+    env_usernames = os.getenv("GITHUB_USERS")
     username_file = 'github_usernames.txt'
     
     if env_usernames:

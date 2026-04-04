@@ -111,7 +111,7 @@ class AdvancedGSoCAnalyzer:
         # Note: If time_filter is empty, this fetches all history.
         results = {'prs': [], 'issues': []}
 
-        for type_filter in ["is:pr", "is:pr"]:
+        for type_filter in ["is:issue", "is:pr"]:
             search_query = f"author:{username} org:{org} {type_filter}{self.time_filter}"
             cursor = None
             has_next = True
@@ -228,7 +228,7 @@ class AdvancedGSoCAnalyzer:
     async def analyze_users_async(self, usernames):
         results = []
         async with aiohttp.ClientSession() as session:
-            sem = asyncio.Semaphore(500)
+            sem = asyncio.Semaphore(5)
 
             async def bounded_get(u):
                 async with sem:
@@ -263,7 +263,7 @@ class AdvancedGSoCAnalyzer:
             df['complexity_score']
         )
 
-        df = df.sort_values('total_gsoc_score', ascending=True)
+        df = df.sort_values('total_gsoc_score', ascending=False)
 
         metadata = {
             'Generated On': self.analysis_date,
