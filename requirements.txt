@@ -1,0 +1,6 @@
+aiohttp
+pandas
+xlsxwriter
+python-dateutil
+python-dotenv
+requests
